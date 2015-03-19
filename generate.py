@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-
+import binascii
 # Based on https://github.com/offensive-security/kali-nethunter/blob/master/utils/files/modules/keyseed.py
 
 ## Numbers
@@ -52,32 +52,35 @@ dict_us = {
 	"?": "\\x20\\x00\\x00\\x38\\x00\\x00\\x00\\x00",
 	"@": "\\x20\\x00\\x00\\x1f\\x00\\x00\\x00\\x00",
 }
+cmwn = "\\x80\\x00\\x00\\x2c\\x00\\x00\\x00\\x00" 
+enter = "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00"
+stop = "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
 
-def open_term():
-	# Open terminal
-	#Windows
-	print('echo -ne "\\x80\\x00\\x00\\x2c\\x00\\x00\\x00\\x00" > /dev/hidg0')
-	#Space
-	print('echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"  > /dev/hidg0\n')
+file = sys.argv[1]
+f = open('attack', 'w')
 
-def build_string():
-	string = sys.argv[1]
+def cmd_space():
+	f.write(binascii.unhexlify(cmwn.replace('\\x','')))
+	f.write(binascii.unhexlify(stop.replace('\\x','')))
 
-	for i in string:
-		for a,b in dict_us.items():
-			if i == a:
-				print('echo -ne "%s" > /dev/hidg0'%b)
-				print('echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0\n')
+def press_string():
+	d = open(file, 'r')
+	for i in d.readlines():
+		i = i.replace('\n','')
+		if i == '<enter>':
+			press_enter()
+		if i == '<cmwn>':
+			cmd_space()
+		else:
+			for s in i:
+				for a,b in dict_us.items():
+					if s == a:
+						f.write(binascii.unhexlify(b.replace('\\x','')))			
+						f.write(binascii.unhexlify(stop.replace('\\x','')))
 
 def press_enter():
-	#enter
-	print('echo -ne "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00" > /dev/hidg0')
-	print('echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"  > /dev/hidg0\n')
+	f.write(binascii.unhexlify(enter.replace('\\x','')))
+	f.write(binascii.unhexlify(stop.replace('\\x','')))
 
-def __main__():
-	open_term()
-	build_string()
-	press_enter()
+press_string()
 
-if __name__ == '__main__':
-	__main__()
