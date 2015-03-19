@@ -51,13 +51,14 @@ dict_us = {
 	">": "\\x20\\x00\\x00\\x37\\x00\\x00\\x00\\x00",
 	"?": "\\x20\\x00\\x00\\x38\\x00\\x00\\x00\\x00",
 	"@": "\\x20\\x00\\x00\\x1f\\x00\\x00\\x00\\x00",
+	"%": "\\x00\\x00\\x00\\x2c\\x00\\x00\\x00\\x00",
+	"^": "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00"
 }
 cmwn = "\\x80\\x00\\x00\\x2c\\x00\\x00\\x00\\x00" 
-enter = "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00"
 stop = "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
-
 file = sys.argv[1]
-f = open('attack', 'w')
+name = 'hid/' + str(file) + '_hid' 
+f = open(name, 'w')
 
 def cmd_space():
 	f.write(binascii.unhexlify(cmwn.replace('\\x','')))
@@ -65,22 +66,22 @@ def cmd_space():
 
 def press_string():
 	d = open(file, 'r')
+	commands = []
 	for i in d.readlines():
-		i = i.replace('\n','')
-		if i == '<enter>':
-			press_enter()
-		if i == '<cmwn>':
-			cmd_space()
-		else:
-			for s in i:
-				for a,b in dict_us.items():
-					if s == a:
-						f.write(binascii.unhexlify(b.replace('\\x','')))			
-						f.write(binascii.unhexlify(stop.replace('\\x','')))
-
-def press_enter():
-	f.write(binascii.unhexlify(enter.replace('\\x','')))
-	f.write(binascii.unhexlify(stop.replace('\\x','')))
+		commands.append(i.split())
+	for i in commands:
+		for l in i:
+			if l == '<enter>':
+				press_enter()
+			else:
+				if l =='<cmwn>':
+					cmd_space()
+				else:			
+					for s in l:	
+						for a,b in dict_us.items():
+							if s == a:
+								f.write(binascii.unhexlify(b.replace('\\x','')))			
+								f.write(binascii.unhexlify(stop.replace('\\x','')))
 
 press_string()
 
