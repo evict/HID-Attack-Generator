@@ -3,19 +3,17 @@ import sys
 import binascii
 # Based on https://github.com/offensive-security/kali-nethunter/blob/master/utils/files/modules/keyseed.py
 
-## Numbers
-#"\x30": "\\x00\\x00\\x00\\x27\\x00\\x00\\x00\\x00",
-#"\x31": "\\x00\\x00\\x00\\x1e\\x00\\x00\\x00\\x00",
-#"\x32": "\\x00\\x00\\x00\\x1f\\x00\\x00\\x00\\x00",
-#"\x33": "\\x00\\x00\\x00\\x20\\x00\\x00\\x00\\x00",
-#"\x34": "\\x00\\x00\\x00\\x21\\x00\\x00\\x00\\x00",
-#"\x35": "\\x00\\x00\\x00\\x22\\x00\\x00\\x00\\x00",
-#"\x36": "\\x00\\x00\\x00\\x23\\x00\\x00\\x00\\x00",
-#"\x37": "\\x00\\x00\\x00\\x24\\x00\\x00\\x00\\x00",
-#"\x38": "\\x00\\x00\\x00\\x25\\x00\\x00\\x00\\x00",
-#"\x39": "\\x00\\x00\\x00\\x26\\x00\\x00\\x00\\x00",
-
 dict_us = {
+	"0": "\\x00\\x00\\x00\\x27\\x00\\x00\\x00\\x00",
+	"1": "\\x00\\x00\\x00\\x1e\\x00\\x00\\x00\\x00",
+	"2": "\\x00\\x00\\x00\\x1f\\x00\\x00\\x00\\x00",
+	"3": "\\x00\\x00\\x00\\x20\\x00\\x00\\x00\\x00",
+	"4": "\\x00\\x00\\x00\\x21\\x00\\x00\\x00\\x00",
+	"5": "\\x00\\x00\\x00\\x22\\x00\\x00\\x00\\x00",
+	"6": "\\x00\\x00\\x00\\x23\\x00\\x00\\x00\\x00",
+	"7": "\\x00\\x00\\x00\\x24\\x00\\x00\\x00\\x00",
+	"8": "\\x00\\x00\\x00\\x25\\x00\\x00\\x00\\x00",
+	"9": "\\x00\\x00\\x00\\x26\\x00\\x00\\x00\\x00",
 	"a": "\\x00\\x00\\x04\\x00\\x00\\x00\\x00\\x00",
 	"b": "\\x00\\x00\\x05\\x00\\x00\\x00\\x00\\x00",
 	"c": "\\x00\\x00\\x06\\x00\\x00\\x00\\x00\\x00",
@@ -42,6 +40,7 @@ dict_us = {
 	"x": "\\x00\\x00\\x1b\\x00\\x00\\x00\\x00\\x00",
 	"y": "\\x00\\x00\\x1c\\x00\\x00\\x00\\x00\\x00",
 	"z": "\\x00\\x00\\x1d\\x00\\x00\\x00\\x00\\x00",
+	"-":	"\\x00\\x00\\x00\\x2d\\x00\\x00\\x00\\x00",
 	".": "\\x00\\x00\\x00\\x37\\x00\\x00\\x00\\x00",
 	"/": "\\x00\\x00\\x00\\x38\\x00\\x00\\x00\\x00",
 	":": "\\x20\\x00\\x00\\x33\\x00\\x00\\x00\\x00",
@@ -55,6 +54,7 @@ dict_us = {
 	"^": "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00"
 }
 cmwn = "\\x80\\x00\\x00\\x2c\\x00\\x00\\x00\\x00" 
+winc = "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
 stop = "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
 file = sys.argv[1]
 name = 'hid/' + str(file) + '_hid' 
@@ -62,6 +62,10 @@ f = open(name, 'w')
 
 def cmd_space():
 	f.write(binascii.unhexlify(cmwn.replace('\\x','')))
+	f.write(binascii.unhexlify(stop.replace('\\x','')))
+
+def win():
+	f.write(binascii.unhexlify(winc.replace('\\x','')))
 	f.write(binascii.unhexlify(stop.replace('\\x','')))
 
 def press_string():
@@ -76,12 +80,15 @@ def press_string():
 			else:
 				if l =='<cmwn>':
 					cmd_space()
-				else:			
-					for s in l:	
-						for a,b in dict_us.items():
-							if s == a:
-								f.write(binascii.unhexlify(b.replace('\\x','')))			
-								f.write(binascii.unhexlify(stop.replace('\\x','')))
+				else:
+					if l =='<win>':
+						win()
+					else:			
+						for s in l:	
+							for a,b in dict_us.items():
+								if s == a:
+									f.write(binascii.unhexlify(b.replace('\\x','')))			
+									f.write(binascii.unhexlify(stop.replace('\\x','')))
 
 press_string()
 
