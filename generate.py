@@ -57,7 +57,7 @@ cmwn = "\\x80\\x00\\x00\\x2c\\x00\\x00\\x00\\x00"
 winc = "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
 stop = "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
 file = sys.argv[1]
-name = 'hid/' + str(file) + '_hid' 
+name = 'attacks/' + str(file) + '_hid' 
 f = open(name, 'w')
 
 def cmd_space():
